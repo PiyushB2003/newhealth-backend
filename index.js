@@ -12,7 +12,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/shopifyFormData').then(() => {
+
+
+PiyushB2003
+mongoose.connect('mongodb+srv://piyushborkar95:PiyushB2003@cluster0.qohgr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster07/shopifyformdata').then(() => {
   console.log('Connected to MongoDB');
 }).catch(err => {
   console.log('Error connecting to MongoDB:', err);
