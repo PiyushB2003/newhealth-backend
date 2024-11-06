@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+require('dotenv').config();
 
 // Initialize express app
 const app = express();
@@ -12,10 +13,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // MongoDB connection
-
-
-PiyushB2003
-mongoose.connect('mongodb+srv://piyushborkar95:PiyushB2003@cluster0.qohgr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster07/shopifyformdata').then(() => {
+mongoose.connect(process.env.MONGO_URI).then(() => {
   console.log('Connected to MongoDB');
 }).catch(err => {
   console.log('Error connecting to MongoDB:', err);
@@ -53,7 +51,7 @@ app.post('/submit-form', (req, res) => {
 });
 
 // Start the server
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
