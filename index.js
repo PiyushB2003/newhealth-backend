@@ -8,7 +8,7 @@ require('dotenv').config();
 const app = express();
 
 // Middleware to parse JSON request body
-app.use(cors());
+app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
