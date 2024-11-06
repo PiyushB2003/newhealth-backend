@@ -13,11 +13,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI).then(() => {
-  console.log('Connected to MongoDB');
-}).catch(err => {
-  console.log('Error connecting to MongoDB:', err);
-});
+async function connectToMongoDB() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('Connected to MongoDB');
+  } catch (err) {
+    console.error('Error connecting to MongoDB:', err.message);
+  }
+}
+
+// Call connection function
+connectToMongoDB();
 
 // MongoDB Schema for form data
 const formSchema = new mongoose.Schema({
