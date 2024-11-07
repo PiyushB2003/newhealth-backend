@@ -1,8 +1,12 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-require('dotenv').config();
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import dotenv from 'dotenv';
+import MongoConnect from "./database/Db.js";
+import ShippingOption from "./models/ShippingOption.js";
+
+dotenv.config();
+
 
 // Initialize express app
 const app = express();
@@ -13,40 +17,37 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // MongoDB connection
-async function connectToMongoDB() {
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
-  } catch (err) {
-    console.error('Error connecting to MongoDB:', err.message);
-  }
-}
-
-// Call connection function
-connectToMongoDB();
-
-// MongoDB Schema for form data
-const formSchema = new mongoose.Schema({
-  firstname: { type: String, required: true },
-  lastname: { type: String, required: true },
-  email: { type: String, required: true },
-  address: { type: String, required: true }
-});
-
-// Model for form data
-const FormData = mongoose.model('FormData', formSchema);
+MongoConnect();
 
 // POST route to handle form submission
 app.get("/", (req, res) => {
-    res.send("Hello this is piyush")
+  res.send("Hello this is piyush")
 })
-app.post('/submit-form', (req, res) => {
-  const { firstname, lastname, email, address } = req.body;
 
-  // Create a new document from the form data
+app.post('/submit-form', async (req, res) => {
+
+  try {
+    const {
+      encapsulate, first_name, last_name, address1, address2, city, country, postal_code, email, phone, due_date, allergies, referred_by, placenta_preference, color_preference, signature_umbilical_preference, capsule_preference, terms, hospital, initials, promo_code
+    } = req.body;
+
+    if (!terms) {
+      return res.status(400).json({ message: 'You must agree to the terms.' });
+    }
+    const shipping = await ShippingOption.findOne({ email })
+    if (shipping) {
+      return res.status(409).json({ message: "User already exist", success: false })
+    }
+    const newShipping = new ShippingOption({ encapsulate, first_name, last_name, address1, address2, city, country, postal_code, email, phone, due_date, allergies, referred_by, placenta_preference, color_preference, signature_umbilical_preference, capsule_preference, terms, hospital, initials, promo_code });
+
+    await newShipping.save();
+    res.status(200).json({ message: "Shipping successful", success: true })
+  } catch (error) {
+    console.log("Error while shipping ", error);
+    return res.status(500).json({ message: "Internal server error", success: false });
+  }
   const newFormData = new FormData({ firstname, lastname, email, address });
 
-  // Save to MongoDB
   newFormData.save()
     .then(() => {
       res.send('Form data saved successfully');
